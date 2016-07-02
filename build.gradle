@@ -1,0 +1,48 @@
+group 'com.github.ksouf'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    acceptanceTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+        }
+    }
+}
+
+configurations {
+    acceptanceTestCompile.extendsFrom(testCompile)
+    acceptanceTestRuntime.extendsFrom(testRuntime)
+}
+
+
+task acceptanceTest(type: Test) {
+    testClassesDir = sourceSets.acceptanceTest.output.classesDir
+    classpath = sourceSets.acceptanceTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+}
+
+check.dependsOn acceptanceTest
+acceptanceTest.mustRunAfter test
+
+
+dependencies {
+    compile 'org.apache.commons:commons-lang3:3.0'
+
+    testCompile 'org.mockito:mockito-all:1.9.5'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.assertj:assertj-core:3.3.0'
+
+    acceptanceTestCompile 'info.cukes:cucumber-java:1.2.4'
+    acceptanceTestCompile 'info.cukes:cucumber-junit:1.2.4'
+}
